@@ -14,16 +14,564 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          is_active: boolean
+          leverage: number
+          type: Database["public"]["Enums"]["account_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          leverage?: number
+          type?: Database["public"]["Enums"]["account_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          leverage?: number
+          type?: Database["public"]["Enums"]["account_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          meta: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          meta?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          meta?: Json
+        }
+        Relationships: []
+      }
+      instruments: {
+        Row: {
+          base_price: number
+          category: Database["public"]["Enums"]["instrument_category"]
+          contract_size: number
+          created_at: string
+          digits: number
+          id: string
+          is_tradable: boolean
+          name: string
+          spread: number
+          symbol: string
+          volatility: number
+        }
+        Insert: {
+          base_price: number
+          category: Database["public"]["Enums"]["instrument_category"]
+          contract_size?: number
+          created_at?: string
+          digits?: number
+          id?: string
+          is_tradable?: boolean
+          name: string
+          spread?: number
+          symbol: string
+          volatility?: number
+        }
+        Update: {
+          base_price?: number
+          category?: Database["public"]["Enums"]["instrument_category"]
+          contract_size?: number
+          created_at?: string
+          digits?: number
+          id?: string
+          is_tradable?: boolean
+          name?: string
+          spread?: number
+          symbol?: string
+          volatility?: number
+        }
+        Relationships: []
+      }
+      kyc_submissions: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          document_number: string | null
+          document_ref: string | null
+          document_type: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          nationality: string | null
+          postal_code: string | null
+          proof_of_address_ref: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          status: Database["public"]["Enums"]["kyc_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          document_number?: string | null
+          document_ref?: string | null
+          document_type?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          nationality?: string | null
+          postal_code?: string | null
+          proof_of_address_ref?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          document_number?: string | null
+          document_ref?: string | null
+          document_type?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          nationality?: string | null
+          postal_code?: string | null
+          proof_of_address_ref?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          account_id: string
+          created_at: string
+          filled_at: string | null
+          filled_price: number | null
+          id: string
+          kind: Database["public"]["Enums"]["order_kind"]
+          limit_price: number | null
+          quantity: number
+          reject_reason: string | null
+          side: Database["public"]["Enums"]["order_side"]
+          status: Database["public"]["Enums"]["order_status"]
+          stop_loss: number | null
+          stop_price: number | null
+          symbol: string
+          take_profit: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["order_kind"]
+          limit_price?: number | null
+          quantity: number
+          reject_reason?: string | null
+          side: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_loss?: number | null
+          stop_price?: number | null
+          symbol: string
+          take_profit?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          filled_at?: string | null
+          filled_price?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["order_kind"]
+          limit_price?: number | null
+          quantity?: number
+          reject_reason?: string | null
+          side?: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["order_status"]
+          stop_loss?: number | null
+          stop_price?: number | null
+          symbol?: string
+          take_profit?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          kind: string
+          label: string
+          last4: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          kind?: string
+          label: string
+          last4?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          kind?: string
+          label?: string
+          last4?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      positions: {
+        Row: {
+          account_id: string
+          close_price: number | null
+          closed_at: string | null
+          entry_price: number
+          id: string
+          margin: number
+          opened_at: string
+          order_id: string | null
+          quantity: number
+          realized_pl: number | null
+          side: Database["public"]["Enums"]["order_side"]
+          status: Database["public"]["Enums"]["position_status"]
+          stop_loss: number | null
+          symbol: string
+          take_profit: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          close_price?: number | null
+          closed_at?: string | null
+          entry_price: number
+          id?: string
+          margin?: number
+          opened_at?: string
+          order_id?: string | null
+          quantity: number
+          realized_pl?: number | null
+          side: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["position_status"]
+          stop_loss?: number | null
+          symbol: string
+          take_profit?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          close_price?: number | null
+          closed_at?: string | null
+          entry_price?: number
+          id?: string
+          margin?: number
+          opened_at?: string
+          order_id?: string | null
+          quantity?: number
+          realized_pl?: number | null
+          side?: Database["public"]["Enums"]["order_side"]
+          status?: Database["public"]["Enums"]["position_status"]
+          stop_loss?: number | null
+          symbol?: string
+          take_profit?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "positions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "positions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          country: string | null
+          created_at: string
+          default_leverage: number
+          default_lots: number
+          email: string
+          full_name: string
+          id: string
+          is_suspended: boolean
+          language: string
+          notify_email: boolean
+          notify_push: boolean
+          notify_trade_alerts: boolean
+          phone: string | null
+          theme: string
+          two_factor_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          default_leverage?: number
+          default_lots?: number
+          email?: string
+          full_name?: string
+          id: string
+          is_suspended?: boolean
+          language?: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_trade_alerts?: boolean
+          phone?: string | null
+          theme?: string
+          two_factor_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          default_leverage?: number
+          default_lots?: number
+          email?: string
+          full_name?: string
+          id?: string
+          is_suspended?: boolean
+          language?: string
+          notify_email?: boolean
+          notify_push?: boolean
+          notify_trade_alerts?: boolean
+          phone?: string | null
+          theme?: string
+          two_factor_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          id: string
+          method: string | null
+          note: string | null
+          reference: string | null
+          status: Database["public"]["Enums"]["txn_status"]
+          type: Database["public"]["Enums"]["txn_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          reference?: string | null
+          status?: Database["public"]["Enums"]["txn_status"]
+          type: Database["public"]["Enums"]["txn_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          note?: string | null
+          reference?: string | null
+          status?: Database["public"]["Enums"]["txn_status"]
+          type?: Database["public"]["Enums"]["txn_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      watchlist_items: {
+        Row: {
+          created_at: string
+          id: string
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          symbol: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      account_type: "demo" | "live"
+      app_role: "admin" | "user"
+      instrument_category:
+        | "forex"
+        | "stocks"
+        | "crypto"
+        | "indices"
+        | "commodities"
+      kyc_status: "not_started" | "pending" | "approved" | "rejected"
+      order_kind: "market" | "limit" | "stop"
+      order_side: "buy" | "sell"
+      order_status: "pending" | "filled" | "cancelled" | "rejected"
+      position_status: "open" | "closed"
+      txn_status: "pending" | "completed" | "rejected"
+      txn_type: "deposit" | "withdrawal" | "trade" | "fee" | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +698,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_type: ["demo", "live"],
+      app_role: ["admin", "user"],
+      instrument_category: [
+        "forex",
+        "stocks",
+        "crypto",
+        "indices",
+        "commodities",
+      ],
+      kyc_status: ["not_started", "pending", "approved", "rejected"],
+      order_kind: ["market", "limit", "stop"],
+      order_side: ["buy", "sell"],
+      order_status: ["pending", "filled", "cancelled", "rejected"],
+      position_status: ["open", "closed"],
+      txn_status: ["pending", "completed", "rejected"],
+      txn_type: ["deposit", "withdrawal", "trade", "fee", "adjustment"],
+    },
   },
 } as const
