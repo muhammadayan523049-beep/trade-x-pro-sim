@@ -46,14 +46,15 @@ export const updateProfile = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => profileSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("profiles").update(data).eq("id", userId);
+    const patch = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+    const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
     if (error) throw new Error(error.message);
     await supabase.from("audit_logs").insert({
       actor_id: userId,
       action: "profile.update",
       entity: "profiles",
       entity_id: userId,
-      meta: data as Record<string, unknown>,
+      meta: JSON.parse(JSON.stringify(patch)),
     });
     return { ok: true };
   });
