@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { executionPrice, quoteFor, computePl, marginRequired, type Instrument } from "./market-sim";
 import { protectiveHit, shouldTrigger, type OrderRow, type PositionRow } from "./trading-engine";
 
-type Client = SupabaseClient<never, never, never>;
+type Client = SupabaseClient;
 
 interface SyncResult {
   filledOrders: number;
