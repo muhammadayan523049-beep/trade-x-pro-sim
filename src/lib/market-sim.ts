@@ -41,6 +41,7 @@ export interface Candle {
   high: number;
   low: number;
   close: number;
+  volume: number;
 }
 
 export const TIMEFRAMES = [
@@ -140,12 +141,17 @@ export function candlesFor(inst: Instrument, timeframe: TimeframeKey, count = 90
     for (let s = 0; s <= steps; s++) {
       samples.push(priceAt(inst, start + ((end - start) * s) / steps));
     }
+    const high = roundTo(Math.max(...samples), inst.digits);
+    const low = roundTo(Math.min(...samples), inst.digits);
+    const range = high - low;
+    const base = Math.max(1, inst.base_price === 0 ? 1 : range / (inst.base_price * inst.volatility || 1));
     out.push({
       time: start,
       open: roundTo(samples[0]!, inst.digits),
       close: roundTo(samples[samples.length - 1]!, inst.digits),
-      high: roundTo(Math.max(...samples), inst.digits),
-      low: roundTo(Math.min(...samples), inst.digits),
+      high,
+      low,
+      volume: Math.round(400 + base * 600 + (Math.abs(Math.sin(bucket * 12.9898)) * 1000)),
     });
   }
   return out;
