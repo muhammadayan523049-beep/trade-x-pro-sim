@@ -45,7 +45,9 @@ function DashboardPage() {
     [state?.positions, bySymbol, now],
   );
   const metrics = accountMetrics(Number(account?.balance ?? 0), open, (state?.closed ?? []) as PositionRow[]);
-  const watch = (me?.watchlist ?? []).map((s) => bySymbol[s]).filter(Boolean);
+  const watch = (me?.watchlist ?? [])
+    .map((s) => bySymbol[s])
+    .filter((i): i is NonNullable<typeof i> => Boolean(i));
 
   async function onClose(id: string) {
     setBusy(id);
