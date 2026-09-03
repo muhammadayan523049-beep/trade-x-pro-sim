@@ -80,6 +80,71 @@ export type Database = {
         }
         Relationships: []
       }
+      binary_trades: {
+        Row: {
+          account_id: string
+          created_at: string
+          direction: Database["public"]["Enums"]["binary_direction"]
+          duration_seconds: number
+          entry_price: number
+          expires_at: string
+          expiry_price: number | null
+          id: string
+          opened_at: string
+          payout: number | null
+          payout_rate: number
+          settled_at: string | null
+          stake: number
+          status: Database["public"]["Enums"]["binary_status"]
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          direction: Database["public"]["Enums"]["binary_direction"]
+          duration_seconds: number
+          entry_price: number
+          expires_at: string
+          expiry_price?: number | null
+          id?: string
+          opened_at?: string
+          payout?: number | null
+          payout_rate?: number
+          settled_at?: string | null
+          stake: number
+          status?: Database["public"]["Enums"]["binary_status"]
+          symbol: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          direction?: Database["public"]["Enums"]["binary_direction"]
+          duration_seconds?: number
+          entry_price?: number
+          expires_at?: string
+          expiry_price?: number | null
+          id?: string
+          opened_at?: string
+          payout?: number | null
+          payout_rate?: number
+          settled_at?: string | null
+          stake?: number
+          status?: Database["public"]["Enums"]["binary_status"]
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "binary_trades_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instruments: {
         Row: {
           base_price: number
@@ -559,6 +624,8 @@ export type Database = {
     Enums: {
       account_type: "demo" | "live"
       app_role: "admin" | "user"
+      binary_direction: "up" | "down"
+      binary_status: "open" | "won" | "lost" | "tie"
       instrument_category:
         | "forex"
         | "stocks"
@@ -701,6 +768,8 @@ export const Constants = {
     Enums: {
       account_type: ["demo", "live"],
       app_role: ["admin", "user"],
+      binary_direction: ["up", "down"],
+      binary_status: ["open", "won", "lost", "tie"],
       instrument_category: [
         "forex",
         "stocks",
