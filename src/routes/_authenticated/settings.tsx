@@ -47,8 +47,7 @@ function SettingsPage() {
   const [form, setForm] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  const text = (key: "full_name" | "phone" | "country") =>
-    form[key] ?? (profile?.[key] ?? "") ?? "";
+  const text = (key: "full_name" | "phone" | "country") => form[key] ?? profile?.[key] ?? "";
 
   async function persist(patch: Record<string, unknown>) {
     setBusy(true);
