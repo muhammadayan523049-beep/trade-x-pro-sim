@@ -77,13 +77,13 @@ function PortfolioPage() {
         <MetricCard label="Equity" value={money(metrics.equity)} />
         <MetricCard
           label="Unrealised P/L"
-          value={signedMoney(metrics.unrealized)}
-          tone={metrics.unrealized >= 0 ? "up" : "down"}
+          value={signedMoney(metrics.openPl)}
+          tone={metrics.openPl >= 0 ? "up" : "down"}
         />
         <MetricCard
-          label="Realised P/L"
-          value={signedMoney(metrics.realized)}
-          tone={metrics.realized >= 0 ? "up" : "down"}
+          label="Overall P/L"
+          value={signedMoney(metrics.overallPl)}
+          tone={metrics.overallPl >= 0 ? "up" : "down"}
         />
         <MetricCard
           label="Win rate"
