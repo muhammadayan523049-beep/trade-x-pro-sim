@@ -55,7 +55,7 @@ function VerificationPage() {
     | undefined;
 
   function value(key: string) {
-    return form[key] ?? ((record as unknown as Record<string, string | null>)?.[key] ?? "") ?? "";
+    return form[key] ?? (record as unknown as Record<string, string | null> | null | undefined)?.[key] ?? "";
   }
 
   async function send() {
