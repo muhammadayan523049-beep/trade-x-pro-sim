@@ -8,7 +8,15 @@ import { AppShell } from "@/components/AppShell";
 import { Empty, MetricCard, Panel, StatusTag, Td, Th } from "@/components/trading-ui";
 import { Button } from "@/components/ui/button";
 import { dateTime, money } from "@/lib/format";
-import { getAdminOverview, reviewKyc, reviewTransaction, setUserSuspended } from "@/lib/admin.functions";
+import {
+  adjustBalance,
+  getAdminOverview,
+  reviewKyc,
+  reviewTransaction,
+  setUserRole,
+  setUserSuspended,
+} from "@/lib/admin.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -212,48 +220,108 @@ function AdminPage() {
           )}
         </Panel>
 
-        <Panel title="Users">
+        <Panel title="Users — roles, access and balances">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr>
                   <Th>Name</Th>
                   <Th>Email</Th>
+                  <Th>Role</Th>
                   <Th>Status</Th>
+                  <Th right>Balance</Th>
                   <Th>Joined</Th>
                   <Th right>Actions</Th>
                 </tr>
               </thead>
               <tbody>
-                {profiles.map((p) => (
-                  <tr key={p.id} className="border-t border-border">
-                    <Td>{p.full_name || "—"}</Td>
-                    <Td>{p.email}</Td>
-                    <Td>
-                      <StatusTag status={p.is_suspended ? "rejected" : "completed"} />
-                    </Td>
-                    <Td>{dateTime(p.created_at)}</Td>
-                    <Td right>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() =>
-                          act(
-                            () => suspendFn({ data: { userId: p.id, suspended: !p.is_suspended } }),
-                            p.is_suspended ? "User reinstated." : "User suspended.",
-                          )
-                        }
-                      >
-                        {p.is_suspended ? "Reinstate" : "Suspend"}
-                      </Button>
-                    </Td>
-                  </tr>
-                ))}
+                {profiles.map((p) => {
+                  const isAdmin = adminIds.has(p.id);
+                  const userAccounts = accountsByUser.get(p.id) ?? [];
+                  const total = userAccounts.reduce((s, a) => s + Number(a.balance ?? 0), 0);
+                  const primary = userAccounts[0];
+                  return (
+                    <tr key={p.id} className="border-t border-border">
+                      <Td>{p.full_name || "—"}</Td>
+                      <Td>{p.email}</Td>
+                      <Td>
+                        <span
+                          className={
+                            isAdmin
+                              ? "rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground"
+                              : "text-xs text-muted-foreground"
+                          }
+                        >
+                          {isAdmin ? "Admin" : "User"}
+                        </span>
+                      </Td>
+                      <Td>
+                        <StatusTag status={p.is_suspended ? "rejected" : "completed"} />
+                      </Td>
+                      <Td right>{money(total)}</Td>
+                      <Td>{dateTime(p.created_at)}</Td>
+                      <Td right>
+                        <span className="flex flex-wrap justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy || !primary}
+                            onClick={() => {
+                              if (!primary) return;
+                              const raw = window.prompt(
+                                `Adjust balance for ${p.email} (use a minus sign to deduct):`,
+                                "1000",
+                              );
+                              if (raw === null) return;
+                              const amount = Number(raw);
+                              if (!Number.isFinite(amount) || amount === 0) {
+                                toast.error("Enter a valid amount.");
+                                return;
+                              }
+                              void act(
+                                () => balanceFn({ data: { accountId: primary.id, amount, note: "" } }),
+                                "Balance updated.",
+                              );
+                            }}
+                          >
+                            Adjust funds
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy}
+                            onClick={() =>
+                              act(
+                                () => roleFn({ data: { userId: p.id, admin: !isAdmin } }),
+                                isAdmin ? "Admin access removed." : "Admin access granted.",
+                              )
+                            }
+                          >
+                            {isAdmin ? "Remove admin" : "Make admin"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy}
+                            onClick={() =>
+                              act(
+                                () => suspendFn({ data: { userId: p.id, suspended: !p.is_suspended } }),
+                                p.is_suspended ? "User reinstated." : "User suspended.",
+                              )
+                            }
+                          >
+                            {p.is_suspended ? "Reinstate" : "Suspend"}
+                          </Button>
+                        </span>
+                      </Td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </Panel>
+
       </div>
     </AppShell>
   );
