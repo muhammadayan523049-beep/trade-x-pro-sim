@@ -167,3 +167,103 @@ export const setInstrumentStatus = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const adjustBalance = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        accountId: z.string().uuid(),
+        amount: z.number().finite().min(-1_000_000).max(1_000_000),
+        note: z.string().trim().max(200).optional().default(""),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as unknown as SupabaseClient;
+    await assertAdmin(supabase, context.userId);
+
+    const { data: account } = await supabase
+      .from("accounts")
+      .select("id,user_id,balance")
+      .eq("id", data.accountId)
+      .maybeSingle();
+    if (!account) throw new Error("Account not found.");
+    const row = account as { id: string; user_id: string; balance: number };
+
+    const next = Math.round((Number(row.balance) + data.amount) * 100) / 100;
+    if (next < 0) throw new Error("Adjustment would make the balance negative.");
+
+    const { error } = await supabase.from("accounts").update({ balance: next }).eq("id", row.id);
+    if (error) throw new Error(error.message);
+
+    await supabase.from("transactions").insert({
+      user_id: row.user_id,
+      account_id: row.id,
+      type: "adjustment",
+      amount: data.amount,
+      status: "completed",
+      method: "admin",
+      note: data.note || "Admin balance adjustment",
+    });
+    await supabase.from("notifications").insert({
+      user_id: row.user_id,
+      title: "Balance adjusted",
+      body: `An administrator adjusted your account balance by ${data.amount.toFixed(2)} USD.`,
+    });
+    await supabase.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: "account.adjust",
+      entity: "accounts",
+      entity_id: row.id,
+      meta: { amount: data.amount, note: data.note },
+    });
+    return { ok: true, balance: next };
+  });
+
+export const setUserRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ userId: z.string().uuid(), admin: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as unknown as SupabaseClient;
+    await assertAdmin(supabase, context.userId);
+
+    if (data.userId === context.userId && !data.admin) {
+      throw new Error("You cannot remove your own admin access.");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (data.admin) {
+      const { error } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: data.userId, role: "admin" }, { onConflict: "user_id,role" });
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabaseAdmin
+        .from("user_roles")
+        .delete()
+        .eq("user_id", data.userId)
+        .eq("role", "admin");
+      if (error) throw new Error(error.message);
+    }
+
+    await supabase.from("notifications").insert({
+      user_id: data.userId,
+      title: data.admin ? "Admin access granted" : "Admin access removed",
+      body: data.admin
+        ? "You now have administrator control of the platform."
+        : "Your administrator access has been removed.",
+    });
+    await supabase.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: data.admin ? "role.grant_admin" : "role.revoke_admin",
+      entity: "user_roles",
+      entity_id: data.userId,
+      meta: {},
+    });
+    return { ok: true };
+  });
+
