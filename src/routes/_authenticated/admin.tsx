@@ -220,7 +220,7 @@ function AdminPage() {
           )}
         </Panel>
 
-        <Panel title="Users" subtitle="Full control: roles, access and balances">
+        <Panel title="Users — roles, access and balances">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
