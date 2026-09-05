@@ -11,6 +11,7 @@ import {
   Menu,
   PieChart,
   Settings,
+  Timer,
   ShieldCheck,
   Wallet,
   X,
@@ -24,6 +25,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
   { to: "/terminal", label: "Terminal", icon: CandlestickChart },
+  { to: "/binary", label: "Binary", icon: Timer },
   { to: "/markets", label: "Markets", icon: LayoutGrid },
   { to: "/portfolio", label: "Portfolio", icon: PieChart },
   { to: "/wallet", label: "Wallet", icon: Wallet },
