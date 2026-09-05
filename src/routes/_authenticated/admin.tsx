@@ -8,7 +8,15 @@ import { AppShell } from "@/components/AppShell";
 import { Empty, MetricCard, Panel, StatusTag, Td, Th } from "@/components/trading-ui";
 import { Button } from "@/components/ui/button";
 import { dateTime, money } from "@/lib/format";
-import { getAdminOverview, reviewKyc, reviewTransaction, setUserSuspended } from "@/lib/admin.functions";
+import {
+  adjustBalance,
+  getAdminOverview,
+  reviewKyc,
+  reviewTransaction,
+  setUserRole,
+  setUserSuspended,
+} from "@/lib/admin.functions";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
