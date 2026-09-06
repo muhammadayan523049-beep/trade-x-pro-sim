@@ -26,7 +26,11 @@ const moveSchema = z.object({
   accountId: z.string().uuid(),
   amount: z.number().min(1).max(1_000_000),
   method: z.string().trim().min(1).max(60),
+  destination: z.string().trim().max(200).optional().default(""),
 });
+
+export const MIN_LIVE_DEPOSIT = 10;
+export const MIN_WITHDRAWAL = 10;
 
 export const requestDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
