@@ -148,8 +148,6 @@ function WalletPage() {
   const [reference, setReference] = useState("");
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
-  const [label, setLabel] = useState("");
-  const [last4, setLast4] = useState("");
 
   const chosenAddress = useMemo(
     () => addresses.find((a) => a.network === network) ?? addresses[0],
