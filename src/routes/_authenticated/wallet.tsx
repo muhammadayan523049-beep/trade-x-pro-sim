@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Bitcoin, Building2, Check, Copy, CreditCard, Trash2, Wallet } from "lucide-react";
+import { Bitcoin, Building2, Check, Copy, CreditCard, Wallet } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { useDepositAddresses } from "@/components/DepositAddresses";
@@ -13,13 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { money } from "@/lib/format";
 import type { DepositAddressRow } from "@/lib/deposit-address.functions";
-import {
-  deletePaymentMethod,
-  getWallet,
-  requestDeposit,
-  requestWithdrawal,
-  savePaymentMethod,
-} from "@/lib/wallet.functions";
+import { getWallet, requestDeposit, requestWithdrawal } from "@/lib/wallet.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
@@ -133,8 +127,6 @@ function WalletPage() {
   const fetchWallet = useServerFn(getWallet);
   const deposit = useServerFn(requestDeposit);
   const withdraw = useServerFn(requestWithdrawal);
-  const saveMethod = useServerFn(savePaymentMethod);
-  const removeMethod = useServerFn(deletePaymentMethod);
   const queryClient = useQueryClient();
 
   const { data } = useQuery({ queryKey: ["wallet"], queryFn: () => fetchWallet(), refetchInterval: 15_000 });
@@ -156,8 +148,6 @@ function WalletPage() {
   const [reference, setReference] = useState("");
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
-  const [label, setLabel] = useState("");
-  const [last4, setLast4] = useState("");
 
   const chosenAddress = useMemo(
     () => addresses.find((a) => a.network === network) ?? addresses[0],
@@ -410,53 +400,6 @@ function WalletPage() {
             )}
           </Panel>
 
-          <Panel title="Payment methods">
-            <ul className="space-y-2">
-              {(data?.methods ?? []).map((m) => {
-                const pm = m as { id: string; label: string; kind: string; last4: string | null };
-                return (
-                  <li
-                    key={pm.id}
-                    className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm"
-                  >
-                    <span>
-                      {pm.label} <span className="text-muted-foreground">•••• {pm.last4}</span>
-                    </span>
-                    <button
-                      aria-label="Remove payment method"
-                      onClick={async () => {
-                        await removeMethod({ data: { id: pm.id } });
-                        await queryClient.invalidateQueries({ queryKey: ["wallet"] });
-                      }}
-                    >
-                      <Trash2 className="size-4 text-muted-foreground" />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="mt-3 space-y-2">
-              <Input placeholder="Label (e.g. Personal Visa)" value={label} onChange={(e) => setLabel(e.target.value)} />
-              <Input placeholder="Last 4 digits" value={last4} onChange={(e) => setLast4(e.target.value)} maxLength={4} />
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={async () => {
-                  try {
-                    await saveMethod({ data: { label, kind: "card", last4 } });
-                    setLabel("");
-                    setLast4("");
-                    toast.success("Payment method saved.");
-                    await queryClient.invalidateQueries({ queryKey: ["wallet"] });
-                  } catch (error) {
-                    toast.error(error instanceof Error ? error.message : "Could not save method");
-                  }
-                }}
-              >
-                Add method
-              </Button>
-            </div>
-          </Panel>
         </div>
 
         <Panel title="Transaction history">
