@@ -32,7 +32,7 @@ const NAV = [
   { to: "/portfolio", label: "Portfolio", icon: PieChart },
   { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/verification", label: "Verification", icon: ShieldCheck },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/settings", label: "Account", icon: Settings },
 ] as const;
 
 export function useMe() {
