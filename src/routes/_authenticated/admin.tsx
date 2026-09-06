@@ -103,7 +103,14 @@ function AdminPage() {
   const kyc = (data?.kyc ?? []) as KycRow[];
   const pendingTx = transactions.filter((t) => t.status === "pending");
   const pendingKyc = kyc.filter((k) => k.status === "pending");
-  const accounts = (data?.accounts ?? []) as { balance: number }[];
+  const accounts = (data?.accounts ?? []) as { id: string; user_id: string; balance: number }[];
+  const roles = (data?.roles ?? []) as { user_id: string; role: string }[];
+  const adminIds = new Set(roles.filter((r) => r.role === "admin").map((r) => r.user_id));
+  const accountsByUser = new Map<string, { id: string; user_id: string; balance: number }[]>();
+  for (const a of accounts) {
+    accountsByUser.set(a.user_id, [...(accountsByUser.get(a.user_id) ?? []), a]);
+  }
+
 
   return (
     <AppShell title="Admin console" subtitle="Users, verification and wallet review">
