@@ -9,16 +9,18 @@ export const getWallet = createServerFn({ method: "GET" })
     const supabase = context.supabase as unknown as SupabaseClient;
     const userId = context.userId;
 
-    const [accounts, transactions, methods] = await Promise.all([
+    const [accounts, transactions, methods, kyc] = await Promise.all([
       supabase.from("accounts").select("*").eq("user_id", userId).order("type"),
       supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(100),
       supabase.from("payment_methods").select("*").eq("user_id", userId).order("created_at"),
+      supabase.from("kyc_submissions").select("status").eq("user_id", userId).maybeSingle(),
     ]);
 
     return {
       accounts: accounts.data ?? [],
       transactions: transactions.data ?? [],
       methods: methods.data ?? [],
+      kycStatus: ((kyc.data as { status?: string } | null)?.status ?? "not_started") as string,
     };
   });
 
@@ -26,7 +28,11 @@ const moveSchema = z.object({
   accountId: z.string().uuid(),
   amount: z.number().min(1).max(1_000_000),
   method: z.string().trim().min(1).max(60),
+  destination: z.string().trim().max(200).optional().default(""),
 });
+
+export const MIN_LIVE_DEPOSIT = 10;
+export const MIN_WITHDRAWAL = 10;
 
 export const requestDeposit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -46,6 +52,10 @@ export const requestDeposit = createServerFn({ method: "POST" })
 
     // Demo accounts are topped up instantly with simulated funds.
     const instant = acct.type === "demo";
+    if (!instant && data.amount < MIN_LIVE_DEPOSIT) {
+      throw new Error(`Minimum deposit is $${MIN_LIVE_DEPOSIT}.`);
+    }
+    const reference = `DEP-${Date.now().toString(36).toUpperCase()}`;
     const { data: tx, error } = await supabase
       .from("transactions")
       .insert({
@@ -55,7 +65,10 @@ export const requestDeposit = createServerFn({ method: "POST" })
         amount: data.amount,
         status: instant ? "completed" : "pending",
         method: data.method,
-        note: "Simulated deposit — no real funds are moved.",
+        reference,
+        note: instant
+          ? "Demo top-up — simulated funds credited instantly."
+          : `Awaiting payment confirmation.${data.destination ? ` Sender/TxID: ${data.destination}` : ""}`,
       })
       .select("id")
       .single();
@@ -95,6 +108,21 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     if (!account) throw new Error("Account not found.");
     const acct = account as { id: string; type: string; balance: number };
 
+    if (acct.type === "demo") {
+      throw new Error("Withdrawals are not available on a demo account — switch to your live account.");
+    }
+    if (data.amount < MIN_WITHDRAWAL) throw new Error(`Minimum withdrawal is $${MIN_WITHDRAWAL}.`);
+    if (!data.destination) throw new Error("Enter the wallet address or account to send funds to.");
+
+    const { data: kyc } = await supabase
+      .from("kyc_submissions")
+      .select("status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if ((kyc as { status?: string } | null)?.status !== "approved") {
+      throw new Error("Verification required — complete identity verification before withdrawing.");
+    }
+
     const { data: openRows } = await supabase
       .from("positions")
       .select("margin")
@@ -117,7 +145,8 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
         amount: -Math.abs(data.amount),
         status: "pending",
         method: data.method,
-        note: "Simulated withdrawal — awaiting review.",
+        reference: `WDR-${Date.now().toString(36).toUpperCase()}`,
+        note: `Payout to ${data.destination} — awaiting review.`,
       })
       .select("id")
       .single();
