@@ -62,6 +62,9 @@ function AdminPage() {
   const kycFn = useServerFn(reviewKyc);
   const txFn = useServerFn(reviewTransaction);
   const suspendFn = useServerFn(setUserSuspended);
+  const balanceFn = useServerFn(adjustBalance);
+  const roleFn = useServerFn(setUserRole);
+
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
 
