@@ -145,6 +145,42 @@ export type Database = {
           },
         ]
       }
+      deposit_addresses: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          instructions: string | null
+          is_active: boolean
+          memo: string | null
+          network: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          memo?: string | null
+          network: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          memo?: string | null
+          network?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       instruments: {
         Row: {
           base_price: number
