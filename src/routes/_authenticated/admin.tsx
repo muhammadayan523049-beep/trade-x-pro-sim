@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { DepositAddressAdmin } from "@/components/DepositAddressAdmin";
 import { Empty, MetricCard, Panel, StatusTag, Td, Th } from "@/components/trading-ui";
 import { Button } from "@/components/ui/button";
 import { dateTime, money } from "@/lib/format";
@@ -125,6 +126,8 @@ function AdminPage() {
       </div>
 
       <div className="mt-4 space-y-4">
+        <DepositAddressAdmin />
+
         <Panel title="Verification queue">
           {pendingKyc.length === 0 ? (
             <Empty>No verifications waiting for review.</Empty>
