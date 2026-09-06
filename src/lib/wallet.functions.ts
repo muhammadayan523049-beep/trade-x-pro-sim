@@ -9,16 +9,18 @@ export const getWallet = createServerFn({ method: "GET" })
     const supabase = context.supabase as unknown as SupabaseClient;
     const userId = context.userId;
 
-    const [accounts, transactions, methods] = await Promise.all([
+    const [accounts, transactions, methods, kyc] = await Promise.all([
       supabase.from("accounts").select("*").eq("user_id", userId).order("type"),
       supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(100),
       supabase.from("payment_methods").select("*").eq("user_id", userId).order("created_at"),
+      supabase.from("kyc_submissions").select("status").eq("user_id", userId).maybeSingle(),
     ]);
 
     return {
       accounts: accounts.data ?? [],
       transactions: transactions.data ?? [],
       methods: methods.data ?? [],
+      kycStatus: ((kyc.data as { status?: string } | null)?.status ?? "not_started") as string,
     };
   });
 
