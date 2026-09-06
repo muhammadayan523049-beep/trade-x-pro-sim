@@ -50,6 +50,10 @@ export const requestDeposit = createServerFn({ method: "POST" })
 
     // Demo accounts are topped up instantly with simulated funds.
     const instant = acct.type === "demo";
+    if (!instant && data.amount < MIN_LIVE_DEPOSIT) {
+      throw new Error(`Minimum deposit is $${MIN_LIVE_DEPOSIT}.`);
+    }
+    const reference = `DEP-${Date.now().toString(36).toUpperCase()}`;
     const { data: tx, error } = await supabase
       .from("transactions")
       .insert({
@@ -59,7 +63,10 @@ export const requestDeposit = createServerFn({ method: "POST" })
         amount: data.amount,
         status: instant ? "completed" : "pending",
         method: data.method,
-        note: "Simulated deposit — no real funds are moved.",
+        reference,
+        note: instant
+          ? "Demo top-up — simulated funds credited instantly."
+          : `Awaiting payment confirmation.${data.destination ? ` Sender/TxID: ${data.destination}` : ""}`,
       })
       .select("id")
       .single();
