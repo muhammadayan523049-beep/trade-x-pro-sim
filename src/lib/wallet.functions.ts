@@ -106,6 +106,21 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     if (!account) throw new Error("Account not found.");
     const acct = account as { id: string; type: string; balance: number };
 
+    if (acct.type === "demo") {
+      throw new Error("Withdrawals are not available on a demo account — switch to your live account.");
+    }
+    if (data.amount < MIN_WITHDRAWAL) throw new Error(`Minimum withdrawal is $${MIN_WITHDRAWAL}.`);
+    if (!data.destination) throw new Error("Enter the wallet address or account to send funds to.");
+
+    const { data: kyc } = await supabase
+      .from("kyc_submissions")
+      .select("status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if ((kyc as { status?: string } | null)?.status !== "approved") {
+      throw new Error("Verification required — complete identity verification before withdrawing.");
+    }
+
     const { data: openRows } = await supabase
       .from("positions")
       .select("margin")
@@ -128,7 +143,8 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
         amount: -Math.abs(data.amount),
         status: "pending",
         method: data.method,
-        note: "Simulated withdrawal — awaiting review.",
+        reference: `WDR-${Date.now().toString(36).toUpperCase()}`,
+        note: `Payout to ${data.destination} — awaiting review.`,
       })
       .select("id")
       .single();
