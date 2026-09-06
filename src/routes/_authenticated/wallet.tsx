@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { DepositAddresses } from "@/components/DepositAddresses";
 import { MetricCard, Panel, TransactionsTable, type TxRow } from "@/components/trading-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,6 +90,8 @@ function WalletPage() {
         </Panel>
 
         <div className="space-y-4">
+          <DepositAddresses />
+
           <Panel title="Move funds">
             <div className="space-y-3">
               <div className="space-y-1.5">
