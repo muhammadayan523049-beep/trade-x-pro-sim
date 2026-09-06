@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Bitcoin, Building2, Check, Copy, CreditCard, Trash2, Wallet } from "lucide-react";
+import { Bitcoin, Building2, Check, Copy, CreditCard, Wallet } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { useDepositAddresses } from "@/components/DepositAddresses";
@@ -13,13 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { money } from "@/lib/format";
 import type { DepositAddressRow } from "@/lib/deposit-address.functions";
-import {
-  deletePaymentMethod,
-  getWallet,
-  requestDeposit,
-  requestWithdrawal,
-  savePaymentMethod,
-} from "@/lib/wallet.functions";
+import { getWallet, requestDeposit, requestWithdrawal } from "@/lib/wallet.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
