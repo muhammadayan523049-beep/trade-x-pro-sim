@@ -127,8 +127,6 @@ function WalletPage() {
   const fetchWallet = useServerFn(getWallet);
   const deposit = useServerFn(requestDeposit);
   const withdraw = useServerFn(requestWithdrawal);
-  const saveMethod = useServerFn(savePaymentMethod);
-  const removeMethod = useServerFn(deletePaymentMethod);
   const queryClient = useQueryClient();
 
   const { data } = useQuery({ queryKey: ["wallet"], queryFn: () => fetchWallet(), refetchInterval: 15_000 });
